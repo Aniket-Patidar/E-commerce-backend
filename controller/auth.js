@@ -3,64 +3,77 @@ const crypto = require('crypto')
 const { sanitizeUser } = require('../services/comman');
 const jwt = require('jsonwebtoken');
 const { sendmail } = require("../services/sendMail");
+const catchAsyncError = require("../middleware/catchAsynError.js");
+const ErrorHandler = require("../utils/ErrorHandler.js.js");
+const bcrypt = require('bcrypt');
 
-exports.createUser = async (req, res) => {
+
+
+exports.register = catchAsyncError(async (req, res, next) => {
+    console.log(req.body);
     try {
-        const salt = crypto.randomBytes(16);
-        crypto.pbkdf2(
-            req.body.password,
-            salt,
-            310000,
-            32,
-            'sha256',
-            async function (err, hashedPassword) {
-                const user = new User({ ...req.body, password: hashedPassword, salt });
-                const doc = await user.save();
+        const { email, password } = req.body;
 
-                req.login(sanitizeUser(doc), (err) => {
-                    // this also calls serializer and adds to session
-                    if (err) {
-                        res.status(400).json(err);
-                    } else {
-                        const token = jwt.sign(
-                            sanitizeUser(doc),
-                            process.env.JWT_SECRET_KEY
-                        );
-                        res
-                            .cookie('jwt', token, {
-                                expires: new Date(Date.now() + 3600000),
-                                httpOnly: true,
-                            })
-                            .status(201)
-                            .json({ success: true, user: doc });
-                    }
-                });
-            }
-        );
-    } catch (err) {
-        res.status(400).json({ success: false, msg: "please enter vaild data" });
+        if (!email || !password) {
+
+            return next(new ErrorHandler('please enter credentials', 400));
+        }
+
+        const user = await User.findOne({ email: email });
+
+        if (user) {
+            return next(new ErrorHandler('User all ready exist', 400));
+        }
+
+        const newUser = await User.create({ email, password });
+        await newUser.save();
+        console.log(newUser);
+        const token = jwt.sign({ _id: newUser.id }, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.EXPIRE) });
+        res.status(200).json({ success: true, user: newUser, token });
+    } catch (error) {
+        next(error);
     }
-};
+});
 
-exports.getUserInfo = async (req, res) => {
-    const user = await User.findById(req.user.id);
+exports.login = catchAsyncError(async (req, res, next) => {
     try {
-        res.status(201).json({ success: true, user: user })
-    } catch (err) {
-        res.status(400).json({ success: false, msg: "user not found" })
-    }
-};
+        const { email, password } = req.body;
+        const user = await User.findOne({ email: email });
 
-exports.loginUser = async (req, res) => {
-    const user = req.user;
-    res
-        .cookie('jwt', user.token, {
-            expires: new Date(Date.now() + 3600000),
-            httpOnly: true,
-        })
-        .status(201)
-        .json({ user: user });
-};
+        if (!user) {
+            return next(new ErrorHandler('User not found', 404));
+        }
+
+        // const isMatch = await user.comparePassword(password);
+        // const isMatch = await bcrypt.compare(password, usepassword);
+        // if (!isMatch) {
+        //     return next(new ErrorHandler('Invalid password', 400));
+        // }
+
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.EXPIRE) });
+        res.status(200).json({ success: true, user, token: token });
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
+
+exports.jwt = catchAsyncError(async (req, res, next) => {
+    const userId = req.user._id;
+    try {
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return next(new ErrorHandler('User not found', 404));
+        }
+        const token = jwt.sign({ _id: userId }, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.EXPIRE) });
+        res.status(200).json({ success: true, user, token: token });
+    } catch (error) {
+        next(error);
+    }
+});
+
+
+
 
 exports.logout = async (req, res) => {
     res.cookie('jwt', null, {

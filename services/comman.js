@@ -13,6 +13,12 @@ exports.cookieExtractor = function (req) {
     if (req && req.cookies) {
         token = req.cookies['jwt'];
     }
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZmRiMTNlNTk5M2Q3MGM0NDg5NDQ2MiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY5NDQzODU2OH0.BqUyBiEz4Kt3-wK2IPGfZDXO_OZlTPwnITt2QE7lh6E"
+
+
+    console.log(req.headers, "token",token);
+    console.log(req.headers.Authorization, "token", token);
+
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1YzdmZWQ0ODJmODkyNTJhY2FmMDNlMiIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzA3NjA1NzE2fQ.c4-J1rKcCKIZGdfGKsD0e7uZRJ2RD3QqfUGqRhxucMQ"
+
     return token;
 };

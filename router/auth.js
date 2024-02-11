@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router()
-const { createUser, loginUser, checkUser, getUserInfo, logout, resetPasswordRequest, resetPassword } = require('../controller/auth');
+const { checkUser, getUserInfo, logout, resetPasswordRequest, resetPassword, register, login, jwt } = require('../controller/auth');
 const passport = require('passport');
+const authenticateToken = require('../middleware/jwt');
 
 
 
-router.post('/signup', createUser)
-router.get('/logout', logout)
-router.post('/login', passport.authenticate('local'), loginUser)
-router.get('/check', passport.authenticate('jwt'), checkUser)
-router.get('/userInfo', passport.authenticate('jwt'), getUserInfo)
+router.post('/signup', register)
+router.post('/login', login)
+router.get('/userInfo', authenticateToken, jwt)
+router.get('/check', authenticateToken, jwt)
+router.get('/logout', authenticateToken, logout)
 router.post('/reset-password-request', resetPasswordRequest)
 router.post('/reset-password', resetPassword)
 module.exports = router

@@ -12,7 +12,7 @@ exports.getUserById = async (req, res) => {
 };
 
 exports.updateUserAddress = async (req, res) => {
-    const { id } = req.user;
+    const { _id: id } = req.user;
     try {
         const user = await User.findByIdAndUpdate(id, req.body, { new: true });
         res.status(200).json(user);
@@ -23,7 +23,7 @@ exports.updateUserAddress = async (req, res) => {
 
 
 exports.removeAddress = async (req, res) => {
-    const { id } = req.user;
+    const { _id: id } = req.user;
 
     console.log(req.body);
     try {
@@ -35,25 +35,29 @@ exports.removeAddress = async (req, res) => {
 };
 
 exports.uploadImage = async (req, res) => {
-    const { id } = req.user;
-    const file = req.file;
-    console.log(req.file,"file");
+    const { _id: id } = req.user;
+    const file = req.file.path;
     try {
+
+
+
+        
         const user = await User.findByIdAndUpdate(id, { image: file });
+        await user.save();
         res.status(200).json(user);
     } catch (err) {
-        console.log(err);
+        console.log(err,"==");
         res.status(400).json(err);
     }
 };
 
 
 exports.updateProfile = async (req, res) => {
-    const { id } = req.user;
+    const { _id: id } = req.user;
 
 
     try {
-     
+
         const user = await User.findByIdAndUpdate(id, req.body);
         res.status(200).json(user);
     } catch (err) {

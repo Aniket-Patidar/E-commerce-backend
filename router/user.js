@@ -4,24 +4,24 @@ const { getUserById, updateUserAddress, removeAddress, uploadImage, updateProfil
 const multer = require("multer");
 const path = require("path");
 const crypto = require("crypto");
+const authenticateToken = require('../middleware/jwt');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './uploads/');
     },
     filename: function (req, file, cb) {
-        console.log(file,"lalal");
         cb(null, file.originalname);
     }
 });
 
 const upload = multer({ storage: storage })
 
-router.get('/:id', getUserById)
-    .patch('/', updateUserAddress)
-    .patch('/removeAddress', removeAddress)
-    .post("/image", upload.single("avatar"), uploadImage)
-    .post("/ProfileUpdate", updateProfile)
+router.get('/:id', authenticateToken,getUserById)
+    .patch('/',authenticateToken,updateUserAddress)
+    .patch('/removeAddress', authenticateToken,removeAddress)
+    .post("/image", authenticateToken,upload.single("image"), uploadImage)
+    .post("/ProfileUpdate", authenticateToken,updateProfile)
 
 
 module.exports = router
