@@ -1,67 +1,86 @@
 const { User } = require("../model/user");
+const catchAsyncError = require("../middleware/catchAsynError.js");
+const ErrorHandler = require("../utils/ErrorHandler.js.js");
 
-exports.getUserById = async (req, res) => {
+
+exports.updateProfile = catchAsyncError(async (req, res) => {
+    const { _id: id } = req.user;
+    const { email } = req.body;
+
+    try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser && existingUser._id.toString() !== id) {
+            throw new ErrorHandler("Email ID already in use", 400);
+        }
+
+        const user = await User.findByIdAndUpdate(id, { ...req.body }, { new: true });
+
+        if (!user) {
+            throw new ErrorHandler("User not found", 404);
+        }
+
+        res.status(200).json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(err.statusCode || 500).json({ msg: err.message || "Internal Server Error" });
+    }
+});
+
+
+exports.getUserById = catchAsyncError(async (req, res) => {
     const Id = req.params.id;
     try {
-        const user = await User.findById(Id)
-        res.status(201).json(user)
+        const user = await User.findById(Id);
+        if (!user) {
+            throw new ErrorHandler("User not found", 404);
+        }
+        res.status(200).json(user);
     } catch (err) {
-        res.status(400).json({ msg: "user not found" })
-
+        console.error(err);
+        res.status(err.statusCode || 500).json({ msg: err.message || "Internal Server Error" });
     }
-};
+});
 
-exports.updateUserAddress = async (req, res) => {
+exports.updateUserAddress = catchAsyncError(async (req, res) => {
     const { _id: id } = req.user;
     try {
         const user = await User.findByIdAndUpdate(id, req.body, { new: true });
+        if (!user) {
+            throw new ErrorHandler("User not found", 404);
+        }
         res.status(200).json(user);
     } catch (err) {
-        res.status(400).json(err);
+        console.error(err);
+        res.status(err.statusCode || 500).json({ msg: err.message || "Internal Server Error" });
     }
-};
+});
 
-
-exports.removeAddress = async (req, res) => {
+exports.removeAddress = catchAsyncError(async (req, res) => {
     const { _id: id } = req.user;
-
-    console.log(req.body);
     try {
         const user = await User.findByIdAndUpdate(id, { addresses: req.body.addresses });
+        if (!user) {
+            throw new ErrorHandler("User not found", 404);
+        }
         res.status(200).json(user);
     } catch (err) {
-        res.status(400).json(err);
+        console.error(err);
+        res.status(err.statusCode || 500).json({ msg: err.message || "Internal Server Error" });
     }
-};
+});
 
-exports.uploadImage = async (req, res) => {
+exports.uploadImage = catchAsyncError(async (req, res) => {
     const { _id: id } = req.user;
     const file = req.file.path;
     try {
-
-
-
-        
         const user = await User.findByIdAndUpdate(id, { image: file });
+        if (!user) {
+            throw new ErrorHandler("User not found", 404);
+        }
         await user.save();
         res.status(200).json(user);
     } catch (err) {
-        console.log(err,"==");
-        res.status(400).json(err);
+        console.error(err);
+        res.status(err.statusCode || 500).json({ msg: err.message || "Internal Server Error" });
     }
-};
-
-
-exports.updateProfile = async (req, res) => {
-    const { _id: id } = req.user;
-
-
-    try {
-
-        const user = await User.findByIdAndUpdate(id, req.body);
-        res.status(200).json(user);
-    } catch (err) {
-        res.status(400).json(err);
-    }
-};
-
+});

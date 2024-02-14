@@ -1,7 +1,6 @@
 const nodemailer = require("nodemailer");
 
 exports.sendmail = (req, res, next, url) => {
-    console.log(url);
     const transport = nodemailer.createTransport({
         server: "gmail",
         host: "smtp.gmail.com",
@@ -25,8 +24,7 @@ exports.sendmail = (req, res, next, url) => {
         return res.status(200).json({
             msg: "mail send successfully",
             url,
+            success:true
         })
-
     })
-
 }
