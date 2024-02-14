@@ -1,6 +1,7 @@
 const { Order } = require("../model/order");
 
 exports.getALLOderTOAdmin = async (req, res) => {
+    
     let query = Order.find({});
     let totalOrdersQuery = Order.find({});
     const totalDocs = await totalOrdersQuery.count().exec();
@@ -20,7 +21,10 @@ exports.getALLOderTOAdmin = async (req, res) => {
     } catch (err) {
         res.status(400).json(err);
     }
+
+
 };
+
 exports.updateOrder = async (req, res) => {
     const order = await Order.findByIdAndUpdate(req.params.id, req.body);
     try {
