@@ -12,14 +12,12 @@ const errorMiddleware = require('./middleware/errorMiddelWare');
 connectDB()
 
 
-const allowedOrigins = ['https://e-commerce-front-end-pink.vercel.app/', 'http://localhost:3000/'];
 
-
-
-
-
-
-app.use(cors());
+app.use(
+    cors({
+      exposedHeaders: ['X-Total-Count'],
+    })
+  );
 
 
 app.use(express.json());
