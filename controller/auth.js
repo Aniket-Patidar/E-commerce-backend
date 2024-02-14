@@ -5,7 +5,7 @@ const { sendmail } = require("../services/sendMail");
 const { User } = require("../model/user");
 const catchAsyncError = require("../middleware/catchAsynError.js");
 const ErrorHandler = require("../utils/ErrorHandler.js.js");
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 exports.register = catchAsyncError(async (req, res, next) => {
     try {
@@ -40,6 +40,7 @@ exports.login = catchAsyncError(async (req, res, next) => {
 
         // Add password comparison logic here if needed
 
+
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.EXPIRE) });
         res.status(200).json({ success: true, user: user, token });
     } catch (error) {
@@ -54,6 +55,9 @@ exports.jwt = catchAsyncError(async (req, res, next) => {
         if (!user) {
             throw new ErrorHandler('User not found', 404);
         }
+
+
+
         const token = jwt.sign({ _id: userId }, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.EXPIRE) });
         res.status(200).json({ success: true, user: user, token });
     } catch (error) {
