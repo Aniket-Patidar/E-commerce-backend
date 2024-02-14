@@ -21,7 +21,6 @@ exports.updateProfile = catchAsyncError(async (req, res) => {
 
         res.status(200).json(user);
     } catch (err) {
-        console.error(err);
         res.status(err.statusCode || 500).json({ msg: err.message || "Internal Server Error" });
     }
 });
@@ -36,7 +35,6 @@ exports.getUserById = catchAsyncError(async (req, res) => {
         }
         res.status(200).json(user);
     } catch (err) {
-        console.error(err);
         res.status(err.statusCode || 500).json({ msg: err.message || "Internal Server Error" });
     }
 });
@@ -50,7 +48,6 @@ exports.updateUserAddress = catchAsyncError(async (req, res) => {
         }
         res.status(200).json(user);
     } catch (err) {
-        console.error(err);
         res.status(err.statusCode || 500).json({ msg: err.message || "Internal Server Error" });
     }
 });
@@ -64,7 +61,6 @@ exports.removeAddress = catchAsyncError(async (req, res) => {
         }
         res.status(200).json(user);
     } catch (err) {
-        console.error(err);
         res.status(err.statusCode || 500).json({ msg: err.message || "Internal Server Error" });
     }
 });
@@ -80,7 +76,6 @@ exports.uploadImage = catchAsyncError(async (req, res) => {
         await user.save();
         res.status(200).json(user);
     } catch (err) {
-        console.error(err);
         res.status(err.statusCode || 500).json({ msg: err.message || "Internal Server Error" });
     }
 });

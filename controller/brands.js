@@ -8,7 +8,6 @@ exports.fetchAllBrand = async (req, res, next) => {
         }
         res.status(200).json({ success: true, msg: brands });
     } catch (error) {
-        console.error("Error fetching brands:", error);
         res.status(500).json({ success: false, msg: "Internal server error" });
     }
 };

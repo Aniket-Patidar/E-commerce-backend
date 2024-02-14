@@ -1,54 +1,54 @@
 const { Cart } = require("../model/cart");
+const catchAsyncError = require("../middleware/catchAsynError.js");
+const ErrorHandler = require("../utils/ErrorHandler.js.js");
 
-exports.fetchCartByUser = async (req, res) => {
-    const { _id:id } = req.user;
+
+exports.fetchCartByUser = catchAsyncError(async (req, res, next) => {
+    const { _id: id } = req.user;
     try {
-        const cartItems = await Cart.find({ user: id }).populate('user').populate('product')
-        res.status(200).json(cartItems)
+        const cartItems = await Cart.find({ user: id }).populate('user').populate('product');
+        res.status(200).json(cartItems);
     } catch (err) {
-        res.status(400).json({ msg: "fetchCartByUser Err" })
+        next(err)
     }
-}
+});
 
-exports.addTOCart = async (req, res) => {
-
-    const cart = await Cart.create({ ...req.body, quantity: parseInt(req.body.quantity) })
+exports.addTOCart = catchAsyncError(async (req, res, next) => {
     try {
+        const cart = await Cart.create({ ...req.body, quantity: parseInt(req.body.quantity) });
         const doc = await cart.save();
-        res.status(201).json(doc)
+        res.status(201).json(doc);
     } catch (err) {
-        res.status(400).json({ msg: "addToCart error", err })
+        next(err)
     }
-}
+});
 
-exports.deleteCart = async (req, res) => {
-    const cart = await Cart.findByIdAndDelete(req.params.id)
+exports.deleteCart = catchAsyncError(async (req, res, next) => {
     try {
-        res.status(201).json(cart)
+        const cart = await Cart.findByIdAndDelete(req.params.id);
+        res.status(201).json(cart);
     } catch (err) {
-        res.status(400).json({ msg: "delete single cart error" })
+        next(err)
     }
-}
+});
 
-exports.updateCart = async (req, res) => {
-    const { id } = req.params
-    const cart = await Cart.findByIdAndUpdate(id, { ...req.body })
+exports.updateCart = catchAsyncError(async (req, res, next) => {
+    const { id } = req.params;
     try {
+        const cart = await Cart.findByIdAndUpdate(id, { ...req.body });
         const doc = await cart.save();
-        res.status(201).json(doc)
+        const carts = await Cart.find().populate('user').populate('product');
+        res.status(201).json(carts);
     } catch (err) {
-        res.status(400).json({ id, data: req.body })
+        next(err)
     }
-}
+});
 
-exports.deleteAllCart = async (req, res) => {
+exports.deleteAllCart = catchAsyncError(async (req, res, next) => {
     // const cart = await Cart.deleteMany({ user: req.params.id })
     // try {
     //     res.status(201).json(cart)
     // } catch (err) {
     //     res.status(400).json(err)
     // }
-}
-
-
-
+});

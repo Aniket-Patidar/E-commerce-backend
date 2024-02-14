@@ -15,7 +15,6 @@ exports.fetchOrdersByUser = async (req, res) => {
 };
 
 exports.createOrder = async (req, res) => {
-    console.log(req.body,"==");
     const order = await Order(req.body)
     const productsId = order.items;
     productsId.forEach(async (e) => {
@@ -23,7 +22,6 @@ exports.createOrder = async (req, res) => {
         product.stock = product.stock - e.quantity;
         await product.save();
     })
-    console.log(order);
     try {
         await order.save()
         res.status(201).json(order)
