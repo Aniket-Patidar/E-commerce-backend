@@ -35,18 +35,26 @@ exports.login = catchAsyncError(async (req, res, next) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return next(new ErrorHandler('User not found', 404))
+            return next(new ErrorHandler('User not found', 404));
         }
 
-        // Add password comparison logic here if needed
+        // Check if the provided password matches the hashed password
+        const isPasswordMatched = await user.comparePassword(password);
 
+        if (!isPasswordMatched) {
+            return next(new ErrorHandler('Invalid email or password', 401));
+        }
 
+        // If password is correct, generate JWT token
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.EXPIRE) });
+        
         res.status(200).json({ success: true, user: user, token });
     } catch (error) {
+        console.log(error);
         next(error);
     }
 });
+
 
 exports.jwt = catchAsyncError(async (req, res, next) => {
     const userId = req.user._id;

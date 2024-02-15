@@ -1,23 +1,20 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const bcrypt = require('bcryptjs');
+
 const userSchema = new Schema({
     email: { type: String, required: true, unique: true },
-    password: { type: Buffer, required: true },
+    password: { type: String, required: true },
     role: { type: String, required: true, default: 'user' },
     addresses: { type: [Schema.Types.Mixed] },
     image: String,
     name: { type: String },
     salt: Buffer,
-    phoneNo: {
-        type: Number
-    },
+    phoneNo: { type: Number },
     resetPasswordToken: { type: String, default: '' }
 }, { timestamps: true });
 
-
-
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
         return next();
     }
@@ -30,29 +27,23 @@ userSchema.pre('save', async function (next) {
     }
 });
 
-
-userSchema.methods.comparePassword = async function (candidatePassword) {
+userSchema.methods.comparePassword = async function(candidatePassword) {
     try {
-        return await bcrypt.compare(JSON.stringify(candidatePassword), this.password);
+        return await bcrypt.compare(candidatePassword, this.password);
     } catch (error) {
-        throw error;
+        throw new Error('Error comparing passwords: ' + error.message);
     }
 };
 
-
-
-
-
 const virtual = userSchema.virtual('id');
-virtual.get(function () {
+virtual.get(function() {
     return this._id;
 });
-
 
 userSchema.set('toJSON', {
     virtuals: true,
     versionKey: false,
-    transform: function (doc, ret) {
+    transform: function(doc, ret) {
         delete ret._id;
     },
 });
