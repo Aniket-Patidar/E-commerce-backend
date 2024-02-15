@@ -69,7 +69,7 @@ exports.uploadImage = catchAsyncError(async (req, res) => {
     const { _id: id } = req.user;
     const file = req.file.path;
     try {
-        const user = await User.findByIdAndUpdate(id, { image: file });
+        const user = await User.findByIdAndUpdate(id, { image: file },{ new: true });
         if (!user) {
             throw new ErrorHandler("User not found", 404);
         }

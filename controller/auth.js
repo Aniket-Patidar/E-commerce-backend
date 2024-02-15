@@ -47,7 +47,7 @@ exports.login = catchAsyncError(async (req, res, next) => {
 
         // If password is correct, generate JWT token
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.EXPIRE) });
-        
+
         res.status(200).json({ success: true, user: user, token });
     } catch (error) {
         console.log(error);
@@ -63,7 +63,6 @@ exports.jwt = catchAsyncError(async (req, res, next) => {
         if (!user) {
             throw new ErrorHandler('User not found', 404);
         }
-
 
 
         const token = jwt.sign({ _id: userId }, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.EXPIRE) });
@@ -99,7 +98,7 @@ exports.resetPasswordRequest = async (req, res, next) => {
         const token = crypto.randomBytes(48).toString('hex');
         user.resetPasswordToken = token;
         await user.save();
-        const resetPageLink = 'http://localhost:3000/reset-password?token=' + token + '&email=' + req.body.email;
+        const resetPageLink = 'https://e-commerce-front-end-dun.vercel.app/reset-password?token=' + token + '&email=' + req.body.email;
         sendmail(req, res, next, resetPageLink);
     } catch (error) {
         next(error);
@@ -123,7 +122,7 @@ exports.resetPassword = async (req, res, next) => {
             user.password = hashedPassword;
             user.salt = salt;
             await user.save();
-            res.status(200).json({ success: true, msg: "Password reset successfully" });
+            res.status(200).json({ success: true, msg: "Password reset successfully", user: user });
         });
     } catch (error) {
         next(error);
