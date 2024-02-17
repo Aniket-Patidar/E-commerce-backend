@@ -14,7 +14,7 @@ const userSchema = new Schema({
     resetPasswordToken: { type: String, default: '' }
 }, { timestamps: true });
 
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
     }
@@ -27,7 +27,7 @@ userSchema.pre('save', async function(next) {
     }
 });
 
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
     try {
         return await bcrypt.compare(candidatePassword, this.password);
     } catch (error) {
@@ -36,14 +36,14 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 };
 
 const virtual = userSchema.virtual('id');
-virtual.get(function() {
+virtual.get(function () {
     return this._id;
 });
 
 userSchema.set('toJSON', {
     virtuals: true,
     versionKey: false,
-    transform: function(doc, ret) {
+    transform: function (doc, ret) {
         delete ret._id;
     },
 });
