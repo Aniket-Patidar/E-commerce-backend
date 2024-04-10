@@ -17,11 +17,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage })
 
-router.get('/:id', authenticateToken, getUserById)
+router.get('/', authenticateToken, getUserById)
     .post("/ProfileUpdate", authenticateToken, updateProfile)
     .patch('/', authenticateToken, updateUserAddress)
     .patch('/removeAddress', authenticateToken, removeAddress)
-    .post("/avatar", authenticateToken, upload.single("avatar"), uploadImage)
+    .post("/avatar", authenticateToken, uploadImage)
 
 
 module.exports = router

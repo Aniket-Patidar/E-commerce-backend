@@ -1,5 +1,4 @@
 const crypto = require('crypto');
-const { sanitizeUser } = require('../services/comman');
 const jwt = require('jsonwebtoken');
 const { sendmail } = require("../services/sendMail");
 const { User } = require("../model/user");
@@ -33,21 +32,14 @@ exports.login = catchAsyncError(async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-
         if (!user) {
             return next(new ErrorHandler('User not found', 404));
         }
-
-        // Check if the provided password matches the hashed password
-        const isPasswordMatched = await user.comparePassword(password);
-
+        const isPasswordMatched = await user.comparepassword(password);
         if (!isPasswordMatched) {
             return next(new ErrorHandler('Invalid email or password', 401));
         }
-
-        // If password is correct, generate JWT token
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.EXPIRE) });
-
         res.status(200).json({ success: true, user: user, token });
     } catch (error) {
         console.log(error);

@@ -34,11 +34,11 @@ exports.createOrder = async (req, res) => {
 
 
 
+/* TODO */
 const instance = new Razorpay({
     key_id: process.env.RAZORPAY_API_KEY,
     key_secret: process.env.RAZORPAY_APT_SECRET,
 });
-
 
 exports.checkout = async (req, res) => {
     const options = {
@@ -69,16 +69,11 @@ exports.paymentVerification = async (req, res) => {
     if (isAuthentic) {
         // Database comes here
         console.log("success");
-
-
         // await Payment.create({
         //     razorpay_order_id,
         //     razorpay_payment_id,
         //     razorpay_signature,
         // });
-
-
-
 
         res.redirect(
             `http://localhost:3000/OderSuccessfull/${razorpay_payment_id}`

@@ -8,44 +8,44 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const errorMiddleware = require('./middleware/errorMiddelWare');
+const AdminAuthenticateToken = require('./middleware/isAdmin');
 
 connectDB()
 
-
-
 app.use(
-    cors({
-      exposedHeaders: ['X-Total-Count'],
-    })
-  );
-
-
+  cors({
+    exposedHeaders: ['X-Total-Count'],
+  })
+);
 app.use(express.json());
 app.use(bodyParser.urlencoded())
-
 app.use(cookieParser());
 
 
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use("/products", require("./router/products"))
-app.use("/users", require("./router/user"))
+
+const fileupload = require('express-fileupload');
+app.use(fileupload({
+	useTempFiles: true
+}));
+
+
 app.use("/auth", require("./router/auth"))
+app.use("/users", require("./router/user"))
+app.use("/products", require("./router/products"))
 app.use("/brands", require("./router/brands"))
 app.use("/categories", require("./router/categories"))
 app.use("/cart", require("./router/cart"))
 app.use("/orders", require("./router/order"))
-app.use("/admin", require("./router/admin"))
+app.use("/admin", AdminAuthenticateToken, require("./router/admin"))
 app.use("*", (req, res, next) => {
-    res.status(404).json({
-        status: 404,
-        message: "Not Found"
-    })
+  res.status(404).json({
+    status: 404,
+    message: "Not Found"
+  })
 });
 app.use(errorMiddleware);
 
-
-
-app.listen(8080, () => {
-    console.log("server run");
+app.listen(process.env.PORT, () => {
+  console.log("server run", process.env.PORT);
 })

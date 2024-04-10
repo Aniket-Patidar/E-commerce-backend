@@ -9,8 +9,10 @@ const authenticateToken = require('../middleware/jwt');
 router.post('/signup', register)
 router.post('/login', login)
 router.get('/userInfo', authenticateToken, jwt)
-router.get('/check', authenticateToken, jwt)
 router.get('/logout', authenticateToken, logout)
 router.post('/reset-password-request', resetPasswordRequest)
 router.post('/reset-password', resetPassword)
+
+
+// router.get('/check', authenticateToken, jwt)
 module.exports = router

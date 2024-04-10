@@ -15,7 +15,7 @@ exports.fetchCartByUser = catchAsyncError(async (req, res, next) => {
 
 exports.addTOCart = catchAsyncError(async (req, res, next) => {
     try {
-        const cart = await Cart.create({ ...req.body, quantity: parseInt(req.body.quantity) });
+        const cart = await Cart.create({ ...req.body, user: req.user._id, quantity: parseInt(req.body.quantity) });
         const doc = await cart.save();
         res.status(201).json(doc);
     } catch (err) {
